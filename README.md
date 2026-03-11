@@ -65,6 +65,7 @@ public class Database
         return connection;
     }
 }
+```
 
 ## Método LerDados
 
@@ -110,3 +111,4 @@ public List<string> LerDados(string nomeTabela)
 
     return dados;
 }
+```
