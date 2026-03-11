@@ -44,6 +44,8 @@ Esses conceitos são fundamentais para o desenvolvimento de aplicações que pre
 
 ## Database.cs
 
+## Classe Database
+
 Essa parte foi responsável por criar a **estrutura de conexão com o banco de dados**.
 
 Aqui eu criei uma classe chamada `Database`, que tem a função de centralizar a comunicação entre a aplicação em **C#** e o banco de dados **SQL**.
@@ -62,4 +64,49 @@ public class Database
         MySqlConnection connection = new MySqlConnection(connectionString);
         return connection;
     }
+}
+
+## Método LerDados
+
+Esse foi o método que eu criei para permitir que a aplicação em **C# execute um comando SQL** e consiga retornar os dados de uma tabela do banco.
+
+O método `LerDados` recebe como parâmetro o **nome da tabela** que será consultada. A partir disso, ele executa um comando `SELECT *` para buscar todas as informações dessa tabela.
+
+Para fazer isso, o método primeiro abre uma conexão com o banco de dados utilizando `GetConnection()`. Em seguida, ele cria um comando SQL usando `MySqlCommand` e executa esse comando no banco.
+
+Os resultados retornados são lidos utilizando um `MySqlDataReader`, que permite percorrer cada linha retornada pela consulta.
+
+Dentro do loop, os valores de cada coluna da linha são percorridos dinamicamente e concatenados em uma string. Cada linha montada é adicionada em uma lista chamada `dados`.
+
+Ao final, essa lista é retornada pelo método. Dessa forma, quando o método `LerDados()` é chamado dentro do projeto, ele executa a consulta no banco e **retorna os registros da tabela para a aplicação**.
+
+```csharp
+public List<string> LerDados(string nomeTabela)
+{
+    List<string> dados = new List<string>();
+
+    using (MySqlConnection conn = GetConnection())
+    {
+        conn.Open();
+
+        string query = $"SELECT * FROM {nomeTabela}";
+
+        MySqlCommand cmd = new MySqlCommand(query, conn);
+
+        MySqlDataReader reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            String linha = "";
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                linha += reader.GetValue(i).ToString() + " | ";
+            }
+
+            dados.Add(linha);
+        }
+    }
+
+    return dados;
 }
